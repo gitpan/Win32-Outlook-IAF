@@ -1,5 +1,11 @@
 Revision history for Win32-Outlook-IAF
 
+0.9   Sat Nov 10 20:00:00 2007
+        - Object properties turned into AUTOLOAD proxy methods
+        - Added support for IMAP and NNTP fields
+        - Some updates to documentation
+        - More test cases
+
 0.01  Sun Nov 4 15:30:00 2007
         First version, released on an unsuspecting world.
 
