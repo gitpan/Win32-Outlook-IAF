@@ -53,8 +53,10 @@ is($iaf2->SMTPSecureConnection(),1,'_iaf_bool callback');
 is($iaf2->SMTPSecureConnection(1<0),0,'_iaf_bool callback');
 is($iaf2->SMTPSecureConnection(),0,'_iaf_bool callback');
 
-is($iaf2->POP3UserName(undef),'username','POP3UserName deleted');
+ok(exists $iaf2->{_POP3UserName},'POP3UserName exists');
+is($iaf2->POP3UserName(undef),'username','POP3UserName exists');
 is($iaf2->POP3UserName(),undef,'POP3UserName deleted');
+ok(!exists $iaf2->{_POP3UserName},'POP3UserName deleted');
 
 eval '$iaf2=new Win32::Outlook::IAF(Something => 3);';
 ok($@=~/Unknown argument: Something/,'unknown argument to new()');

@@ -9,7 +9,7 @@ use Carp;
 use vars qw($VERSION @ISA @EXPORT $AUTOLOAD);
 
 
-$VERSION='0.92';
+$VERSION='0.93';
 @ISA=qw(Exporter);
 @EXPORT=qw();
 
@@ -18,10 +18,10 @@ $VERSION='0.92';
 my %const;
 use constant +{%const=(
 	# ConnectionType enums
-	IAF_CT_IE_DEFAULT	=> 0,
+	IAF_CT_LAN		=> 0,
 	IAF_CT_DIALER		=> 1,
 	IAF_CT_DIALUP		=> 2,
-	IAF_CT_LAN		=> 3,
+	IAF_CT_IE_DEFAULT	=> 3,
 	# AuthMethod enums
 	IAF_AM_NONE		=> 0,
 	IAF_AM_SPA		=> 1,
@@ -48,9 +48,9 @@ my $bool_re=qr/^[01]$/;		# boolean
 my $num_re=qr/^\d+$/;		# numeric
 my $regkey_re=qr/^[0-9a-z]*$/i;	# registry key
 
-my $iaf_ct_re=qr/[${\IAF_CT_IE_DEFAULT}-${\IAF_CT_LAN}]/;
-my $iaf_am_re=qr/[${\IAF_AM_NONE}-${\IAF_AM_PLAIN}]/;
-my $iaf_pf_re=qr/[${\IAF_PF_USE_OPTIONS}-${\IAF_PF_HTML}]/;
+my $iaf_ct_re=qr/^[${\IAF_CT_LAN}-${\IAF_CT_IE_DEFAULT}]$/;
+my $iaf_am_re=qr/^[${\IAF_AM_NONE}-${\IAF_AM_PLAIN}]$/;
+my $iaf_pf_re=qr/^[${\IAF_PF_USE_OPTIONS}-${\IAF_PF_HTML}]$/;
 
 # field binary formats
 my $ulong_le_fmt='V'; # an unsigned long in portable little-endian order
@@ -325,7 +325,7 @@ Win32::Outlook::IAF - Internet Account File (*.iaf) management for Outlook Expre
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 
 =head1 SYNOPSIS
@@ -337,7 +337,7 @@ Version 0.92
     my $src='MyAccount.iaf';
 
     local $/;
-    open(INPUT,$src) or die "Can't open $src for reading: $!\n";
+    open(INPUT,$src) || die "Can't open $src for reading: $!\n";
     binmode(INPUT);
 
     $iaf->read_iaf(<INPUT>);
@@ -368,22 +368,24 @@ Version 0.92
 Allows to create SMTP, POP3, IMAP and HTTP email or NNTP news account configuration 
 files, that can be imported by Microsoft Outlook Express/2003 clients.
 
-Reverse operation is possible - most fields from such files can be decoded.
+Reverse operation is possible - all fields from such files can be decoded.
 
 
 =head1 General Methods
 
 =over 4
 
-=item new()
+=item new([field => value])
+
+Creates a new object and sets specified fields values.
 
 =item read_iaf($buffer)
 
-Reads binary data from the specified buffer.
+Reads binary data from the specified buffer and sets all decoded fields.
 
 =item write_iaf($buffer)
 
-Writes binary data into the specified buffer.
+Writes all fields as binary data into the specified buffer.
 
 =item text_iaf($buffer[,$delimiter])
 
@@ -481,7 +483,7 @@ Break apart messages.
 
 =item SMTPSplitMessageSize()
 
-Break apart messages larger than size in KB.
+Break apart messages larger than the size in KB.
 
 =item SMTPSignature()
 
@@ -591,6 +593,8 @@ Root folder path on IMAP server.
 
 =item IMAPUseLSUB()
 
+Use IMAP LSUB command.
+
 =item IMAPPolling()
 
 Include this account when receiving mail or synchronizing.
@@ -601,7 +605,7 @@ Store special folders on IMAP server.
 
 =item IMAPSentItemsFolder()
 
-Send Items folder path on IMAP server.
+Sent Items folder path on IMAP server.
 
 =item IMAPDraftsFolder()
 
@@ -707,7 +711,7 @@ Break apart messages.
 
 =item NNTPSplitMessageSize()
 
-Break apart messages larger than size in KB.
+Break apart messages larger than the size in KB.
 
 =item NNTPUseGroupDescriptions()
 
@@ -763,9 +767,9 @@ Registry key of the NNTP signature.
 
 =over 4
 
-=item IAF_CT_IE_DEFAULT
+=item IAF_CT_LAN
 
-Use IE connection setting.
+Connect using local network.
 
 =item IAF_CT_DIALER
 
@@ -775,9 +779,9 @@ Connect using 3rd party dialer.
 
 Connect using dial-up account.
 
-=item IAF_CT_LAN
+=item IAF_CT_IE_DEFAULT
 
-Connect using local network.
+Use IE connection setting.
 
 =back
 
