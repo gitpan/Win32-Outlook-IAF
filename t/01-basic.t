@@ -14,7 +14,7 @@ my $buf;
 	isa_ok($iaf,'Win32::Outlook::IAF');
 
 	my $src='./t/test.iaf';
-	open(INPUT,"<$src") or die "Can't open $src for reading: $!\n";
+	open(INPUT,"<$src") || die "Can't open $src for reading: $!\n";
 	binmode(INPUT);
 
 	ok($iaf->read_iaf(<INPUT>),'read_iaf() from file');

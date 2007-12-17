@@ -9,7 +9,7 @@ use Carp;
 use vars qw($VERSION @ISA @EXPORT $AUTOLOAD);
 
 
-$VERSION='0.93';
+$VERSION='0.95';
 @ISA=qw(Exporter);
 @EXPORT=qw();
 
@@ -39,7 +39,7 @@ use constant {
 	HEADER			=> "\x66\x4D\x41\x49\x00\x00\x05\x00\x01\x00\x00\x00",
 	PASSWORD_SEED		=> "\x75\x18\x15\x14",
 	PASSWORD_HEADER		=> "\x01\x01",
-	MAX_FIELD_LENGTH	=> 256,
+	MAX_FIELD_LENGTH	=> 4096,
 };
 
 
@@ -78,6 +78,7 @@ my %fields=(
 	'IMAPRootFolder'		=>	[312476656,	$nullstr_fmt,							],
 	'IMAPUseLSUB'			=>	[312673269,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool 		],
 	'IMAPPolling'			=>	[312738805,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
+	'IMAPFullList'			=>	[312804341,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
 	'IMAPStoreSpecialFolders'	=>	[313000949,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
 	'IMAPSentItemsFolder'		=>	[313066480,	$nullstr_fmt,							],
 	'IMAPDraftsFolder'		=>	[313197552,	$nullstr_fmt,							],
@@ -120,12 +121,12 @@ my %fields=(
 	'POP3Password'			=>	[331744246,	$nullstr_fmt,		'',		\&_iaf_password		],
 	'POP3AuthUseSPA'		=>	[331875317,	$ulong_le_fmt,		$bool_re,				],
 	'POP3Port'			=>	[331940841,	$ulong_le_fmt,		$num_re,				],
-	'POP3SecureConnection'		=>	[332006377,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
+	'POP3SecureConnection'		=>	[332006389,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
 	'POP3Timeout'			=>	[332071913,	$ulong_le_fmt,		$num_re,				],
 	'POP3LeaveMailOnServer'		=>	[332137461,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
 	'POP3RemoveWhenDeleted'		=>	[332202997,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
 	'POP3RemoveWhenExpired'		=>	[332268533,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
-	'POP3ExpireDays'		=>	[332334069,	$ulong_le_fmt,		$num_re,				],
+	'POP3ExpireDays'		=>	[332334057,	$ulong_le_fmt,		$num_re,				],
 	'POP3SkipAccount'		=>	[332399605,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
 	'POP3PasswordPrompt'		=>	[332530677,	$ulong_le_fmt,		$bool_re,	\&_iaf_bool		],
 	'SMTPServer'			=>	[338166768,	$nullstr_fmt,							],
@@ -214,7 +215,7 @@ sub read_iaf {
 		confess('Excessive field length: '.$field_len) if $field_len>MAX_FIELD_LENGTH;
 		my $field=substr($$data,$pos,$field_len);
 		$pos+=$field_len;
-		next unless exists $lookup{$field_id};
+		confess('Unknown field: '.$field_id) unless exists $lookup{$field_id};
 		my $field_def=$lookup{$field_id};
 		$field=$field_def->[3]->($field,'read','packed') if $field_def->[3];	# call callback() as 'read packed'
 		$field=unpack($field_def->[1],$field) if $field_def->[1];		# apply binary format
@@ -325,7 +326,7 @@ Win32::Outlook::IAF - Internet Account File (*.iaf) management for Outlook Expre
 
 =head1 VERSION
 
-Version 0.93
+Version 0.95
 
 
 =head1 SYNOPSIS
@@ -337,7 +338,7 @@ Version 0.93
     my $src='MyAccount.iaf';
 
     local $/;
-    open(INPUT,$src) || die "Can't open $src for reading: $!\n";
+    open(INPUT,"<$src") || die "Can't open $src for reading: $!\n";
     binmode(INPUT);
 
     $iaf->read_iaf(<INPUT>);
@@ -598,6 +599,8 @@ Use IMAP LSUB command.
 =item IMAPPolling()
 
 Include this account when receiving mail or synchronizing.
+
+=item IMAPFullList()
 
 =item IMAPStoreSpecialFolders()
 
