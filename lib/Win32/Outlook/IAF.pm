@@ -9,7 +9,7 @@ use Carp;
 use vars qw($VERSION @ISA @EXPORT $AUTOLOAD);
 
 
-$VERSION='0.95';
+$VERSION='0.96';
 @ISA=qw(Exporter);
 @EXPORT=qw();
 
@@ -321,12 +321,12 @@ __DATA__
 
 =head1 NAME
 
-Win32::Outlook::IAF - Internet Account File (*.iaf) management for Outlook Express/2003.
+Win32::Outlook::IAF - Internet Account File (*.iaf) management for Outlook Express/2000.
 
 
 =head1 VERSION
 
-Version 0.95
+Version 0.96
 
 
 =head1 SYNOPSIS
@@ -367,7 +367,7 @@ Version 0.95
 =head1 DESCRIPTION
 
 Allows to create SMTP, POP3, IMAP and HTTP email or NNTP news account configuration 
-files, that can be imported by Microsoft Outlook Express/2003 clients.
+files, that can be imported by Microsoft Outlook Express/2000 clients.
 
 Reverse operation is possible - all fields from such files can be decoded.
 

@@ -1,5 +1,8 @@
 Revision history for Win32-Outlook-IAF
 
+0.96  Sat Dec 22 18:00:00
+        - Updated module metadata (description)
+
 0.95  Mon Dec 17 18:00:00 2007
         - Added IMAPFullList method
         - Fixed POP3ExpireDays and POP3SecureConnection field id's
